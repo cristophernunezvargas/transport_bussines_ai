@@ -128,4 +128,71 @@ class IndexTest extends TestCase
         $this->assertSame(1, $alerts['overdue']);
         $this->assertSame(1, $alerts['upcoming']);
     }
+
+    public function test_month_and_year_totals_include_trips_outside_the_current_week(): void
+    {
+        $truck = Truck::factory()->create();
+        $currentWeekStart = Period::weekContaining(now())->start;
+
+        // Same calendar month as today, but always before the current week
+        // only when today isn't in the month's first week — so pin the
+        // trips relative to the month/year instead of the week.
+        Trip::factory()->create([
+            'truck_id' => $truck->id,
+            'status' => TripStatus::Completed,
+            'actual_end' => now()->startOfMonth(),
+            'distance' => 100,
+            'price' => 60000,
+        ]);
+        Trip::factory()->create([
+            'truck_id' => $truck->id,
+            'status' => TripStatus::Completed,
+            'actual_end' => now()->startOfYear(),
+            'distance' => 50,
+            'price' => 10000,
+        ]);
+
+        $this->actingAs(User::factory()->viewer()->create());
+
+        $component = Livewire::test(Index::class)->instance();
+
+        $startOfMonthInWeek = now()->startOfMonth()->gte($currentWeekStart);
+        $startOfYearInWeek = now()->startOfYear()->gte($currentWeekStart);
+        $startOfYearInMonth = now()->startOfYear()->isSameMonth(now());
+
+        $this->assertSame(($startOfMonthInWeek ? 60000.0 : 0.0) + ($startOfYearInWeek ? 10000.0 : 0.0), $component->fleetTotals['revenue']);
+        $this->assertSame(60000.0 + ($startOfYearInMonth ? 10000.0 : 0.0), $component->monthTotals['revenue']);
+        $this->assertSame(70000.0, $component->yearTotals['revenue']);
+    }
+
+    public function test_month_and_year_navigators_shift_their_period_independently(): void
+    {
+        $this->actingAs(User::factory()->viewer()->create());
+
+        $component = Livewire::test(Index::class);
+        $weekStart = $component->instance()->period()->start->toDateString();
+        $month = $component->instance()->monthPeriod()->start;
+        $year = $component->instance()->yearPeriod()->start;
+
+        $component->call('previousMonth')->call('previousYear')->call('previousYear');
+
+        $this->assertTrue($component->instance()->monthPeriod()->start->isSameDay($month->copy()->subMonth()));
+        $this->assertSame($year->year - 2, $component->instance()->yearPeriod()->start->year);
+        $this->assertSame($weekStart, $component->instance()->period()->start->toDateString());
+
+        $component->call('thisMonth')->call('thisYear');
+
+        $this->assertTrue($component->instance()->monthPeriod()->start->isSameDay($month));
+        $this->assertSame($year->year, $component->instance()->yearPeriod()->start->year);
+    }
+
+    public function test_the_page_labels_the_three_periods(): void
+    {
+        $this->actingAs(User::factory()->viewer()->create());
+
+        Livewire::test(Index::class)
+            ->assertSee('Semanal')
+            ->assertSee('Mensual')
+            ->assertSee('Anual');
+    }
 }

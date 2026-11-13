@@ -68,4 +68,22 @@ class PeriodTest extends TestCase
         // Mounted from the middle of the period onward, with no end date yet.
         $this->assertSame(4, $period->overlapDays(Carbon::parse('2026-09-13'), null));
     }
+
+    public function test_month_containing_a_date_spans_the_calendar_month(): void
+    {
+        $period = Period::monthContaining(Carbon::parse('2026-02-14'));
+
+        $this->assertSame('2026-02-01', $period->start->toDateString());
+        $this->assertSame('2026-02-28', $period->end->toDateString());
+        $this->assertSame(28, $period->days());
+    }
+
+    public function test_year_containing_a_date_spans_the_calendar_year(): void
+    {
+        $period = Period::yearContaining(Carbon::parse('2026-10-25'));
+
+        $this->assertSame('2026-01-01', $period->start->toDateString());
+        $this->assertSame('2026-12-31', $period->end->toDateString());
+        $this->assertSame(365, $period->days());
+    }
 }

@@ -221,7 +221,11 @@ at the same `dashboard` route/name (no other route or link needed to change). Re
 no Policy — every authenticated role can view it, same as every other model's `viewAny`.
 A `previousWeek()`/`nextWeek()`/`thisWeek()` navigator moves an `anchorDate` through
 `Period::weekContaining()` (Thu→Wed, ADR 0003); everything on the page is scoped to that
-one week. It shows: fleet-wide revenue/cost/profit/margin/cost-per-km/revenue-per-km
+one week. Below the week there are two more independent sections — a calendar **month**
+(`Period::monthContaining()`) and a calendar **year** (`Period::yearContaining()`), each
+with its own navigator and the same KPI cards + per-truck table, rendered by
+`<x-dashboard-section>` and labelled Semanal / Mensual / Anual (2026-11-12). Each section
+shows: fleet-wide revenue/cost/profit/margin/cost-per-km/revenue-per-km
 (summed from `FinancialCalculator::fleetSummary()`), a per-truck breakdown table
 (including availability % and utilization %), and preventive-maintenance alert counts
 (`MaintenanceSchedule::status()` tallied across active schedules). A `flux:callout`

@@ -11,7 +11,9 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 
 /**
- * The weekly KPI dashboard from docs/finance/financial-model.md: fleet
+ * The KPI dashboard from docs/finance/financial-model.md, shown for three
+ * independent periods side by side — weekly (Thu→Wed, ADR 0003), calendar
+ * month and calendar year, each with its own navigator: fleet
  * revenue/cost/profit/margin, cost & revenue per km, availability &
  * utilization, and preventive-maintenance alerts. Every per-km figure is an
  * estimate while trip distance still defaults from route.standard_km
@@ -24,15 +26,54 @@ use Livewire\Component;
  * @phpstan-import-type FleetRow from FinancialCalculator
  *
  * @property-read list<FleetRow> $fleetRows Livewire's #[Computed] magic property — see fleetRows() below.
+ * @property-read list<FleetRow> $monthRows
+ * @property-read list<FleetRow> $yearRows
  */
 #[Title('Dashboard')]
 class Index extends Component
 {
+    /** Anchor of the weekly summary. */
     public string $anchorDate = '';
+
+    public string $monthAnchor = '';
+
+    public string $yearAnchor = '';
 
     public function mount(): void
     {
         $this->anchorDate = now()->toDateString();
+        $this->monthAnchor = now()->toDateString();
+        $this->yearAnchor = now()->toDateString();
+    }
+
+    public function previousMonth(): void
+    {
+        $this->monthAnchor = Carbon::parse($this->monthAnchor)->startOfMonth()->subMonth()->toDateString();
+    }
+
+    public function nextMonth(): void
+    {
+        $this->monthAnchor = Carbon::parse($this->monthAnchor)->startOfMonth()->addMonth()->toDateString();
+    }
+
+    public function thisMonth(): void
+    {
+        $this->monthAnchor = now()->toDateString();
+    }
+
+    public function previousYear(): void
+    {
+        $this->yearAnchor = Carbon::parse($this->yearAnchor)->startOfYear()->subYear()->toDateString();
+    }
+
+    public function nextYear(): void
+    {
+        $this->yearAnchor = Carbon::parse($this->yearAnchor)->startOfYear()->addYear()->toDateString();
+    }
+
+    public function thisYear(): void
+    {
+        $this->yearAnchor = now()->toDateString();
     }
 
     public function previousWeek(): void
@@ -68,22 +109,49 @@ class Index extends Component
     #[Computed]
     public function fleetTotals(): array
     {
-        $rows = $this->fleetRows;
+        return $this->totalsOf($this->fleetRows);
+    }
 
-        $revenue = round(array_sum(array_column($rows, 'revenue')), 2);
-        $totalCost = round(array_sum(array_column($rows, 'total_cost')), 2);
-        $profitNet = round(array_sum(array_column($rows, 'profit_net')), 2);
-        $km = round(array_sum(array_column($rows, 'km')), 2);
+    /**
+     * @return list<FleetRow>
+     */
+    #[Computed]
+    public function monthRows(): array
+    {
+        return app(FinancialCalculator::class)->fleetSummary($this->monthPeriod());
+    }
 
-        return [
-            'revenue' => $revenue,
-            'total_cost' => $totalCost,
-            'profit_net' => $profitNet,
-            'km' => $km,
-            'margin_pct' => $revenue > 0 ? round($profitNet / $revenue * 100, 2) : null,
-            'cost_per_km' => $km > 0 ? round($totalCost / $km, 2) : null,
-            'revenue_per_km' => $km > 0 ? round($revenue / $km, 2) : null,
-        ];
+    /**
+     * @return array{
+     *     revenue: float, total_cost: float, profit_net: float, km: float,
+     *     margin_pct: ?float, cost_per_km: ?float, revenue_per_km: ?float,
+     * }
+     */
+    #[Computed]
+    public function monthTotals(): array
+    {
+        return $this->totalsOf($this->monthRows);
+    }
+
+    /**
+     * @return list<FleetRow>
+     */
+    #[Computed]
+    public function yearRows(): array
+    {
+        return app(FinancialCalculator::class)->fleetSummary($this->yearPeriod());
+    }
+
+    /**
+     * @return array{
+     *     revenue: float, total_cost: float, profit_net: float, km: float,
+     *     margin_pct: ?float, cost_per_km: ?float, revenue_per_km: ?float,
+     * }
+     */
+    #[Computed]
+    public function yearTotals(): array
+    {
+        return $this->totalsOf($this->yearRows);
     }
 
     /**
@@ -110,5 +178,40 @@ class Index extends Component
     public function period(): Period
     {
         return Period::weekContaining(Carbon::parse($this->anchorDate));
+    }
+
+    public function monthPeriod(): Period
+    {
+        return Period::monthContaining(Carbon::parse($this->monthAnchor));
+    }
+
+    public function yearPeriod(): Period
+    {
+        return Period::yearContaining(Carbon::parse($this->yearAnchor));
+    }
+
+    /**
+     * @param  list<FleetRow>  $rows
+     * @return array{
+     *     revenue: float, total_cost: float, profit_net: float, km: float,
+     *     margin_pct: ?float, cost_per_km: ?float, revenue_per_km: ?float,
+     * }
+     */
+    private function totalsOf(array $rows): array
+    {
+        $revenue = round(array_sum(array_column($rows, 'revenue')), 2);
+        $totalCost = round(array_sum(array_column($rows, 'total_cost')), 2);
+        $profitNet = round(array_sum(array_column($rows, 'profit_net')), 2);
+        $km = round(array_sum(array_column($rows, 'km')), 2);
+
+        return [
+            'revenue' => $revenue,
+            'total_cost' => $totalCost,
+            'profit_net' => $profitNet,
+            'km' => $km,
+            'margin_pct' => $revenue > 0 ? round($profitNet / $revenue * 100, 2) : null,
+            'cost_per_km' => $km > 0 ? round($totalCost / $km, 2) : null,
+            'revenue_per_km' => $km > 0 ? round($revenue / $km, 2) : null,
+        ];
     }
 }

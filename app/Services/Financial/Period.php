@@ -32,6 +32,29 @@ final class Period
     }
 
     /**
+     * The calendar month containing the given date, for the monthly
+     * dashboard summary. Unlike the weekly default this follows the
+     * calendar (1st -> last day), not the Thursday week.
+     */
+    public static function monthContaining(CarbonInterface $date): self
+    {
+        $date = $date->copy()->startOfDay();
+
+        return new self($date->copy()->startOfMonth(), $date->copy()->endOfMonth()->startOfDay());
+    }
+
+    /**
+     * The calendar year (Jan 1 -> Dec 31) containing the given date, for
+     * the annual dashboard summary.
+     */
+    public static function yearContaining(CarbonInterface $date): self
+    {
+        $date = $date->copy()->startOfDay();
+
+        return new self($date->copy()->startOfYear(), $date->copy()->endOfYear()->startOfDay());
+    }
+
+    /**
      * Number of calendar days in the period, inclusive of both ends.
      */
     public function days(): int
