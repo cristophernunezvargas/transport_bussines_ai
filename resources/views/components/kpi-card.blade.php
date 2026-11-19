@@ -1,24 +1,35 @@
 @props([
     'label',
-    'icon' => 'chart-bar',
     'tone' => 'default',
+    'hero' => false,
+    'note' => null,
 ])
 
 @php
-    $chip = match ($tone) {
-        'good' => 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400',
-        'bad' => 'bg-red-50 text-red-600 dark:bg-red-950 dark:text-red-400',
-        default => 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300',
+    $value = match ($tone) {
+        'good' => 'text-olive',
+        'bad' => 'text-brick',
+        default => 'text-zinc-900 dark:text-white',
     };
-    $value = $tone === 'bad' ? 'text-red-600 dark:text-red-400' : 'text-zinc-900 dark:text-white';
 @endphp
 
-<div {{ $attributes->class('rounded-2xl border border-zinc-200 bg-white p-4 shadow-xs dark:border-zinc-800 dark:bg-zinc-900') }}>
-    <div class="flex items-center justify-between gap-2">
-        <span class="text-sm text-zinc-500 dark:text-zinc-400">{{ $label }}</span>
-        <span class="flex size-8 shrink-0 items-center justify-center rounded-lg {{ $chip }}">
-            <flux:icon :name="$icon" class="size-4" />
-        </span>
+<div {{ $attributes->class([
+    'flex flex-col justify-between rounded-xl border border-zinc-200 bg-white p-4 shadow-[0_1px_2px_rgb(36_28_23/0.05)] dark:border-white/10 dark:bg-zinc-900',
+    'border-l-4' => $hero,
+    'border-l-olive' => $hero && $tone === 'good',
+    'border-l-brick' => $hero && $tone === 'bad',
+    'border-l-accent' => $hero && $tone === 'default',
+]) }}>
+    <span class="text-sm font-medium text-zinc-500 dark:text-zinc-400">{{ $label }}</span>
+    <div>
+        <div @class([
+            'font-display font-semibold tabular-nums leading-none',
+            'mt-3 text-3xl' => ! $hero,
+            'mt-4 text-5xl' => $hero,
+            $value,
+        ])>{{ $slot }}</div>
+        @if ($note)
+            <div class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">{{ $note }}</div>
+        @endif
     </div>
-    <div class="mt-2 text-2xl font-semibold tracking-tight tabular-nums {{ $value }}">{{ $slot }}</div>
 </div>

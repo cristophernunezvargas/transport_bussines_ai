@@ -9,30 +9,55 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    /* Barlow: the highway-signage family. Barlow Condensed carries the
+       headings and big numbers, Barlow the body. */
+    --font-sans: 'Barlow', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-display: 'Barlow Condensed', 'Barlow', ui-sans-serif, system-ui, sans-serif;
 
-    --color-zinc-50: #fafafa;
-    --color-zinc-100: #f5f5f5;
-    --color-zinc-200: #e5e5e5;
-    --color-zinc-300: #d4d4d4;
-    --color-zinc-400: #a3a3a3;
-    --color-zinc-500: #737373;
-    --color-zinc-600: #525252;
-    --color-zinc-700: #404040;
-    --color-zinc-800: #262626;
-    --color-zinc-900: #171717;
-    --color-zinc-950: #0a0a0a;
+    /* Warm neutrals: Flux styles everything with the zinc scale, so
+       remapping it to a brown-tinted grey re-colours the whole app. */
+    --color-zinc-50: #fbf8f3;
+    --color-zinc-100: #f4eee4;
+    --color-zinc-200: #e8dfd0;
+    --color-zinc-300: #d6c9b5;
+    --color-zinc-400: #a99b87;
+    --color-zinc-500: #7b6e60;
+    --color-zinc-600: #5e5246;
+    --color-zinc-700: #473d34;
+    --color-zinc-800: #2f2721;
+    --color-zinc-900: #241c17;
+    --color-zinc-950: #17110d;
 
-    --color-accent: var(--color-blue-700);
-    --color-accent-content: var(--color-blue-700);
-    --color-accent-foreground: var(--color-white);
+    /* Accent: reflector amber. Roles beyond it: brick (bad) and olive (good). */
+    --color-accent: #b45309;
+    --color-accent-content: #92400e;
+    --color-accent-foreground: #fffdf8;
+
+    /* Flux status badges use green; in this palette "ok" is olive. */
+    --color-green-50: var(--color-lime-50);
+    --color-green-100: var(--color-lime-100);
+    --color-green-200: var(--color-lime-200);
+    --color-green-300: var(--color-lime-300);
+    --color-green-400: var(--color-lime-400);
+    --color-green-500: var(--color-lime-500);
+    --color-green-600: var(--color-lime-600);
+    --color-green-700: var(--color-lime-700);
+    --color-green-800: var(--color-lime-800);
+    --color-green-900: var(--color-lime-900);
+    --color-green-950: var(--color-lime-950);
+
+    --color-brick: #b3321f;
+    --color-olive: #4d7c0f;
 }
 
 @layer theme {
     .dark {
-        --color-accent: var(--color-blue-400);
-        --color-accent-content: var(--color-blue-400);
-        --color-accent-foreground: var(--color-zinc-900);
+        --color-accent: #fbbf24;
+        --color-accent-content: #fcd34d;
+        --color-accent-foreground: #241c17;
+
+        --color-brick: #f0816f;
+        --color-olive: #a3d35c;
     }
 }
 
@@ -43,7 +68,7 @@
     ::before,
     ::backdrop,
     ::file-selector-button {
-        border-color: var(--color-gray-200, currentColor);
+        border-color: var(--color-zinc-200, currentColor);
     }
 }
 
@@ -64,3 +89,104 @@ select:focus[data-flux-control] {
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */
+
+/* Headings and big numbers use the condensed face. Unlayered so they win
+   over Flux's own size utilities. */
+[data-flux-heading].text-2xl,
+[data-flux-heading].text-4xl,
+[data-flux-heading].text-base {
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 1.15;
+}
+
+[data-flux-heading].text-2xl {
+    font-size: 2.125rem;
+}
+
+[data-flux-heading].text-4xl {
+    font-size: 3rem;
+    line-height: 1.05;
+}
+
+[data-flux-heading].text-base {
+    font-size: 1.375rem;
+}
+
+/* Tables are L1 surfaces: a framed panel with hairlines, never bare text
+   on the canvas. `.table-bare` drops the frame when a table already sits
+   inside a card. */
+ui-table-scroll-area {
+    background: var(--color-white);
+    border: 1px solid var(--color-zinc-200);
+    border-radius: 0.875rem;
+    box-shadow: 0 1px 2px rgb(36 28 23 / 0.05);
+}
+
+.dark ui-table-scroll-area {
+    background: var(--color-zinc-900);
+    border-color: rgb(255 255 255 / 0.1);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.05);
+}
+
+.table-bare ui-table-scroll-area {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+[data-flux-table] {
+    font-variant-numeric: tabular-nums;
+}
+
+[data-flux-table] [data-flux-column]:first-child,
+[data-flux-table] [data-flux-cell]:first-child {
+    padding-inline-start: 1rem;
+}
+
+[data-flux-table] [data-flux-column]:last-child,
+[data-flux-table] [data-flux-cell]:last-child {
+    padding-inline-end: 1rem;
+}
+
+[data-flux-table] [data-flux-column] {
+    background: var(--color-zinc-50);
+}
+
+.dark [data-flux-table] [data-flux-column] {
+    background: rgb(255 255 255 / 0.03);
+}
+
+[data-flux-table] [data-flux-row] > [data-flux-cell] {
+    border-bottom: 1px solid var(--color-zinc-200);
+}
+
+[data-flux-table] [data-flux-row]:last-child > [data-flux-cell] {
+    border-bottom: 0;
+}
+
+.dark [data-flux-table] [data-flux-row] > [data-flux-cell] {
+    border-bottom-color: rgb(255 255 255 / 0.08);
+}
+
+[data-flux-table] [data-flux-row]:hover > [data-flux-cell] {
+    background: var(--color-zinc-50);
+}
+
+.dark [data-flux-table] [data-flux-row]:hover > [data-flux-cell] {
+    background: rgb(255 255 255 / 0.03);
+}
+
+/* The road line: the one decorative motif, used on the welcome and
+   sign-in pages. */
+.road-line {
+    height: 4px;
+    background: repeating-linear-gradient(90deg, var(--color-accent) 0 28px, transparent 28px 52px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        scroll-behavior: auto !important;
+    }
+}

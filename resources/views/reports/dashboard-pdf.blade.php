@@ -12,46 +12,46 @@
             font-family: 'DejaVu Sans', sans-serif;
             font-size: 9.5px;
             line-height: 1.4;
-            color: #18181b;
+            color: #241c17;
         }
 
         table { width: 100%; border-collapse: collapse; }
-        .muted { color: #71717a; }
+        .muted { color: #7b6e60; }
         .right { text-align: right; }
-        .neg { color: #dc2626; }
+        .neg { color: #b3321f; }
 
         /* Header */
-        .brand { font-size: 15px; font-weight: bold; color: #18181b; }
-        .brand-sub { font-size: 9px; color: #71717a; }
+        .brand { font-size: 15px; font-weight: bold; color: #241c17; }
+        .brand-sub { font-size: 9px; color: #7b6e60; }
         .logo { width: 34px; height: 34px; }
-        .title { font-size: 20px; font-weight: bold; text-align: right; color: #18181b; }
-        .range { font-size: 12px; text-align: right; color: #2563eb; font-weight: bold; }
-        .rule { height: 3px; background: #2563eb; margin: 12px 0 16px 0; }
+        .title { font-size: 20px; font-weight: bold; text-align: right; color: #241c17; }
+        .range { font-size: 12px; text-align: right; color: #b45309; font-weight: bold; }
+        .rule { height: 3px; background: #b45309; margin: 12px 0 16px 0; }
 
         /* KPI cards */
         .kpis { border-collapse: separate; border-spacing: 7px 0; margin-left: -7px; width: 100%; }
         .kpi {
             width: 16.66%;
-            border: 1px solid #e4e4e7;
-            border-top: 3px solid #2563eb;
+            border: 1px solid #e8dfd0;
+            border-top: 3px solid #b45309;
             padding: 8px 9px;
-            background: #fafafa;
+            background: #fbf8f3;
         }
-        .kpi-label { font-size: 8px; color: #71717a; text-transform: uppercase; letter-spacing: 0.4px; }
+        .kpi-label { font-size: 8px; color: #7b6e60; text-transform: uppercase; letter-spacing: 0.4px; }
         .kpi-value { font-size: 15px; font-weight: bold; margin-top: 4px; }
-        .kpi.good { border-top-color: #059669; }
-        .kpi.bad { border-top-color: #dc2626; }
+        .kpi.good { border-top-color: #4d7c0f; }
+        .kpi.bad { border-top-color: #b3321f; }
 
         /* Alerts */
         .alerts { margin-top: 14px; }
         .pill { padding: 3px 9px; font-weight: bold; font-size: 9px; }
-        .pill-red { background: #fee2e2; color: #b91c1c; }
+        .pill-red { background: #f8dcd6; color: #b3321f; }
         .pill-amber { background: #fef3c7; color: #b45309; }
 
         /* Table */
-        h2 { font-size: 11px; margin: 18px 0 6px 0; color: #18181b; }
+        h2 { font-size: 11px; margin: 18px 0 6px 0; color: #241c17; }
         .data th {
-            background: #18181b;
+            background: #241c17;
             color: #ffffff;
             font-size: 8px;
             text-transform: uppercase;
@@ -60,21 +60,21 @@
             text-align: right;
         }
         .data th.left, .data td.left { text-align: left; }
-        .data td { padding: 6px 7px; border-bottom: 1px solid #e4e4e7; text-align: right; }
-        .data tr.alt td { background: #f4f4f5; }
+        .data td { padding: 6px 7px; border-bottom: 1px solid #e8dfd0; text-align: right; }
+        .data tr.alt td { background: #f4eee4; }
         .data td.plate { font-weight: bold; }
         .data tfoot td {
             font-weight: bold;
-            background: #e4e4e7;
-            border-top: 2px solid #18181b;
+            background: #e8dfd0;
+            border-top: 2px solid #241c17;
             border-bottom: none;
         }
         .data tr { page-break-inside: avoid; }
 
-        .note { margin-top: 14px; padding: 7px 10px; background: #eff6ff; border-left: 3px solid #2563eb; color: #1e3a8a; font-size: 8.5px; }
+        .note { margin-top: 14px; padding: 7px 10px; background: #fdf3e3; border-left: 3px solid #b45309; color: #78350f; font-size: 8.5px; }
 
         /* Footer */
-        .footer { position: fixed; left: 0; right: 0; bottom: -34px; font-size: 8px; color: #71717a; border-top: 1px solid #e4e4e7; padding-top: 6px; }
+        .footer { position: fixed; left: 0; right: 0; bottom: -34px; font-size: 8px; color: #7b6e60; border-top: 1px solid #e8dfd0; padding-top: 6px; }
         .pagenum:before { content: counter(page); }
     </style>
 </head>

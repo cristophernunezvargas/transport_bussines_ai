@@ -311,6 +311,10 @@ an environment that might be production is a real risk, not just a formality.
 
 26 new tests. Verified: pint clean, phpstan level 7 clean, full suite 290/290 passing.
 
+## Visual design (2026-11-18)
+
+The app is branded **Transportes M.N.S.T** (`APP_NAME`; wordmark "Transportes" over "M.N.S.T" in `x-app-logo`). The palette is warm and lives entirely in `resources/css/app.css`: Flux styles everything with the `zinc` scale, so `--color-zinc-*` is remapped to brown-tinted neutrals and `--color-accent` is reflector amber (`#b45309`, amber-400 in dark mode). Semantic colours are `brick` (bad/overdue) and `olive` (good); Flux's `green` badges are remapped to olive. Type is Barlow (body) and Barlow Condensed 600 (`font-display`: headings, KPI numbers), loaded through `vite.config.js` fonts. The sidebar is espresso in both themes (a `dark` class on `flux:sidebar` scopes Flux's dark variants to it). Every `flux:table` is a framed L1 panel with hairlines by default; wrap one in `.table-bare` when it already sits inside a card. `.road-line` (dashed amber strip) is the single decorative motif, used on the welcome and sign-in pages; the welcome page also has `x-truck-illustration`. Weights stay within 400/500/600. The PDF template (`reports/dashboard-pdf`) mirrors the palette with hard-coded hex values since dompdf cannot read CSS variables.
+
 ## Current setup gaps (resolve as the relevant phase begins)
 
 - This machine's `C:\php\php.ini` had no CA bundle configured (`curl.cainfo`/`openssl.cafile` empty), so **any** outbound HTTPS call from PHP CLI failed with `cURL error 60: SSL certificate problem`. Fixed by pointing both at a downloaded `C:\php\cacert.pem`. This is a machine-level PHP setting, not part of the repo — note it here in case a fresh machine hits the same `ProviderConnectionException`.

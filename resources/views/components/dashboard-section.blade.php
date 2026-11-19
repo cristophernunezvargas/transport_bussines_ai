@@ -1,6 +1,6 @@
 @props([
     'label',
-    'color' => 'blue',
+    'color' => 'amber',
     'period',
     'rangeText',
     'totals',
@@ -14,17 +14,17 @@
 
 @php
     $bar = match ($color) {
-        'violet' => 'border-t-violet-500',
-        'emerald' => 'border-t-emerald-500',
-        default => 'border-t-blue-500',
+        'red' => 'border-t-brick',
+        'lime' => 'border-t-olive',
+        default => 'border-t-accent',
     };
 @endphp
 
-<section {{ $attributes->class("rounded-2xl border border-t-4 border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-800 dark:bg-zinc-900 $bar") }}>
+<section {{ $attributes->class("rounded-2xl border border-t-4 border-zinc-200 bg-white p-5 shadow-[0_1px_3px_rgb(36_28_23/0.06)] dark:border-white/10 dark:bg-zinc-900 sm:p-6 $bar") }}>
     <div class="flex flex-wrap items-center justify-between gap-3">
-        <div class="flex items-center gap-3">
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
             <flux:badge size="lg" :color="$color">{{ $label }}</flux:badge>
-            <flux:text class="whitespace-nowrap font-medium">{{ $rangeText }}</flux:text>
+            <span class="font-display text-2xl font-semibold leading-none text-zinc-900 dark:text-white">{{ $rangeText }}</span>
         </div>
 
         <div class="flex items-center gap-1">
@@ -38,16 +38,21 @@
         </div>
     </div>
 
-    <div class="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-        <x-kpi-card :label="__('Ingresos')" icon="banknotes">₡{{ number_format($totals['revenue'], 0) }}</x-kpi-card>
-        <x-kpi-card :label="__('Costo total')" icon="receipt-percent">₡{{ number_format($totals['total_cost'], 0) }}</x-kpi-card>
-        <x-kpi-card :label="__('Utilidad neta')" icon="arrow-trending-up" :tone="$totals['profit_net'] < 0 ? 'bad' : 'good'">₡{{ number_format($totals['profit_net'], 0) }}</x-kpi-card>
-        <x-kpi-card :label="__('Margen')" icon="chart-pie">{{ $totals['margin_pct'] !== null ? number_format($totals['margin_pct'], 1).'%' : '—' }}</x-kpi-card>
-        <x-kpi-card :label="__('Costo / km (est.)')" icon="map">{{ $totals['cost_per_km'] !== null ? '₡'.number_format($totals['cost_per_km'], 0) : '—' }}</x-kpi-card>
-        <x-kpi-card :label="__('Ingreso / km (est.)')" icon="map-pin">{{ $totals['revenue_per_km'] !== null ? '₡'.number_format($totals['revenue_per_km'], 0) : '—' }}</x-kpi-card>
+    <div class="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-6">
+        <x-kpi-card
+            hero
+            class="col-span-2"
+            :label="__('Utilidad neta')"
+            :tone="$totals['profit_net'] < 0 ? 'bad' : 'good'"
+            :note="$totals['margin_pct'] !== null ? __('Margen de :pct sobre los ingresos', ['pct' => number_format($totals['margin_pct'], 1).'%']) : __('Sin ingresos en el período')"
+        >₡{{ number_format($totals['profit_net'], 0) }}</x-kpi-card>
+        <x-kpi-card :label="__('Ingresos')">₡{{ number_format($totals['revenue'], 0) }}</x-kpi-card>
+        <x-kpi-card :label="__('Costo total')">₡{{ number_format($totals['total_cost'], 0) }}</x-kpi-card>
+        <x-kpi-card :label="__('Costo / km (est.)')">{{ $totals['cost_per_km'] !== null ? '₡'.number_format($totals['cost_per_km'], 0) : '—' }}</x-kpi-card>
+        <x-kpi-card :label="__('Ingreso / km (est.)')">{{ $totals['revenue_per_km'] !== null ? '₡'.number_format($totals['revenue_per_km'], 0) : '—' }}</x-kpi-card>
     </div>
 
-    <div class="mt-5 overflow-x-auto">
+    <div class="table-bare mt-5 border-t border-zinc-200 dark:border-white/10">
         <flux:table>
             <flux:table.columns>
                 <flux:table.column>{{ __('Camión') }}</flux:table.column>
@@ -68,11 +73,11 @@
                         <flux:table.cell align="end">₡{{ number_format($row['revenue'], 0) }}</flux:table.cell>
                         <flux:table.cell align="end">{{ number_format($row['km'], 0) }}</flux:table.cell>
                         <flux:table.cell align="end">
-                            <a href="{{ route('trucks.costs', ['truck' => $row['truck']->id, 'from' => $period->start->toDateString(), 'to' => $period->end->toDateString()]) }}" wire:navigate class="underline decoration-dotted underline-offset-4 hover:text-blue-600 dark:hover:text-blue-400" title="{{ __('Ver el detalle de costos de :plate', ['plate' => $row['truck']->plate]) }}">
+                            <a href="{{ route('trucks.costs', ['truck' => $row['truck']->id, 'from' => $period->start->toDateString(), 'to' => $period->end->toDateString()]) }}" wire:navigate class="underline decoration-dotted underline-offset-4 hover:text-accent-content" title="{{ __('Ver el detalle de costos de :plate', ['plate' => $row['truck']->plate]) }}">
                                 ₡{{ number_format($row['total_cost'], 0) }}
                             </a>
                         </flux:table.cell>
-                        <flux:table.cell align="end" :class="$row['profit_net'] < 0 ? 'text-red-600 dark:text-red-400' : ''">
+                        <flux:table.cell align="end" :class="$row['profit_net'] < 0 ? 'text-brick' : ''">
                             ₡{{ number_format($row['profit_net'], 0) }}
                         </flux:table.cell>
                         <flux:table.cell align="end">{{ $row['margin_pct'] !== null ? number_format($row['margin_pct'], 1).'%' : '—' }}</flux:table.cell>

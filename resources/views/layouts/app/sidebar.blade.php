@@ -3,8 +3,9 @@
     <head>
         @include('partials.head')
     </head>
-    <body class="min-h-screen bg-zinc-50 dark:bg-zinc-950">
-        <flux:sidebar sticky collapsible="mobile" class="border-e border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+    <body class="min-h-screen bg-zinc-100 antialiased dark:bg-zinc-950">
+        {{-- `dark` scopes Flux's dark variants to the sidebar: it is espresso in both themes. --}}
+        <flux:sidebar sticky collapsible="mobile" class="dark border-e border-zinc-800 bg-zinc-900">
             <flux:sidebar.header>
                 <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate />
                 <flux:sidebar.collapse class="lg:hidden" />
@@ -86,6 +87,8 @@
         <!-- Mobile User Menu -->
         <flux:header class="lg:hidden">
             <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
+
+            <a href="{{ route('dashboard') }}" wire:navigate class="font-display text-xl font-semibold tracking-wide text-zinc-900 dark:text-white">Transportes M.N.S.T</a>
 
             <flux:spacer />
 

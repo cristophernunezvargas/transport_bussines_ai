@@ -17,8 +17,8 @@
     </div>
 
     {{-- Breakdown --}}
-    <div class="mt-6 rounded-2xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-800 dark:bg-zinc-900">
-        <flux:table>
+    <div class="mt-6 rounded-2xl border border-zinc-200 bg-white p-5 shadow-[0_1px_3px_rgb(36_28_23/0.06)] dark:border-white/10 dark:bg-zinc-900">
+        <flux:table container:class="table-bare">
             <flux:table.columns>
                 <flux:table.column>{{ __('Concepto') }}</flux:table.column>
                 <flux:table.column align="end">{{ __('Monto') }}</flux:table.column>
@@ -82,12 +82,12 @@
 
     <div class="mt-6 space-y-6">
         {{-- Fuel --}}
-        <div class="rounded-2xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-800 dark:bg-zinc-900">
+        <div class="rounded-2xl border border-zinc-200 bg-white p-5 shadow-[0_1px_3px_rgb(36_28_23/0.06)] dark:border-white/10 dark:bg-zinc-900">
             <div class="flex items-center justify-between gap-3">
                 <flux:heading size="lg">{{ __('Combustible') }}</flux:heading>
                 <flux:button size="sm" variant="ghost" icon-trailing="arrow-right" :href="route('fuel-records.index')" wire:navigate>{{ __('Ver registros') }}</flux:button>
             </div>
-            <div class="mt-3 overflow-x-auto">
+            <div class="table-bare mt-3 border-t border-zinc-200 dark:border-white/10">
                 <flux:table>
                     <flux:table.columns>
                         <flux:table.column>{{ __('Fecha') }}</flux:table.column>
@@ -116,12 +116,12 @@
         </div>
 
         {{-- Maintenance --}}
-        <div class="rounded-2xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-800 dark:bg-zinc-900">
+        <div class="rounded-2xl border border-zinc-200 bg-white p-5 shadow-[0_1px_3px_rgb(36_28_23/0.06)] dark:border-white/10 dark:bg-zinc-900">
             <div class="flex items-center justify-between gap-3">
                 <flux:heading size="lg">{{ __('Mantenimiento') }}</flux:heading>
                 <flux:button size="sm" variant="ghost" icon-trailing="arrow-right" :href="route('maintenances.index')" wire:navigate>{{ __('Ver historial') }}</flux:button>
             </div>
-            <div class="mt-3 overflow-x-auto">
+            <div class="table-bare mt-3 border-t border-zinc-200 dark:border-white/10">
                 <flux:table>
                     <flux:table.columns>
                         <flux:table.column>{{ __('Fecha') }}</flux:table.column>
@@ -150,12 +150,12 @@
         </div>
 
         {{-- Truck expenses --}}
-        <div class="rounded-2xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-800 dark:bg-zinc-900">
+        <div class="rounded-2xl border border-zinc-200 bg-white p-5 shadow-[0_1px_3px_rgb(36_28_23/0.06)] dark:border-white/10 dark:bg-zinc-900">
             <div class="flex items-center justify-between gap-3">
                 <flux:heading size="lg">{{ __('Gastos del camión') }}</flux:heading>
                 <flux:button size="sm" variant="ghost" icon-trailing="arrow-right" :href="route('truck-expenses.index')" wire:navigate>{{ __('Ver gastos') }}</flux:button>
             </div>
-            <div class="mt-3 overflow-x-auto">
+            <div class="table-bare mt-3 border-t border-zinc-200 dark:border-white/10">
                 <flux:table>
                     <flux:table.columns>
                         <flux:table.column>{{ __('Fecha') }}</flux:table.column>
@@ -182,12 +182,12 @@
         </div>
 
         {{-- Fixed costs --}}
-        <div class="rounded-2xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-800 dark:bg-zinc-900">
+        <div class="rounded-2xl border border-zinc-200 bg-white p-5 shadow-[0_1px_3px_rgb(36_28_23/0.06)] dark:border-white/10 dark:bg-zinc-900">
             <div class="flex items-center justify-between gap-3">
                 <flux:heading size="lg">{{ __('Costos fijos del camión') }}</flux:heading>
                 <flux:button size="sm" variant="ghost" icon-trailing="arrow-right" :href="route('truck-fixed-costs.index')" wire:navigate>{{ __('Ver costos fijos') }}</flux:button>
             </div>
-            <div class="mt-3 overflow-x-auto">
+            <div class="table-bare mt-3 border-t border-zinc-200 dark:border-white/10">
                 <flux:table>
                     <flux:table.columns>
                         <flux:table.column>{{ __('Categoría') }}</flux:table.column>
@@ -215,9 +215,9 @@
 
         {{-- Tolls (screen currently disabled, but data may exist) --}}
         @if ($this->tollRecords->isNotEmpty())
-            <div class="rounded-2xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-800 dark:bg-zinc-900">
+            <div class="rounded-2xl border border-zinc-200 bg-white p-5 shadow-[0_1px_3px_rgb(36_28_23/0.06)] dark:border-white/10 dark:bg-zinc-900">
                 <flux:heading size="lg">{{ __('Peajes') }}</flux:heading>
-                <div class="mt-3 overflow-x-auto">
+                <div class="table-bare mt-3 border-t border-zinc-200 dark:border-white/10">
                     <flux:table>
                         <flux:table.columns>
                             <flux:table.column>{{ __('Fecha') }}</flux:table.column>

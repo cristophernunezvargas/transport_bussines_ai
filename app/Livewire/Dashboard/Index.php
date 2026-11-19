@@ -29,7 +29,7 @@ use Livewire\Component;
  * @property-read list<FleetRow> $monthRows
  * @property-read list<FleetRow> $yearRows
  */
-#[Title('Dashboard')]
+#[Title('Resumen')]
 class Index extends Component
 {
     /** Anchor of the weekly summary. */
