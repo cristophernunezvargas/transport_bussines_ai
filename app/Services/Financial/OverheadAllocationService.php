@@ -35,8 +35,14 @@ class OverheadAllocationService
         $pool = $this->overheadPool($period);
         $trucks = Truck::query()->get();
 
+        $tripsByTruck = Trip::query()
+            ->where('status', TripStatus::Completed)
+            ->whereBetween('actual_end', [$period->start->copy()->startOfDay(), $period->end->copy()->endOfDay()])
+            ->get(['truck_id', 'actual_start', 'actual_end'])
+            ->groupBy('truck_id');
+
         $workedDays = $trucks->mapWithKeys(
-            fn (Truck $truck) => [$truck->id => $this->workedDays($truck, $period)]
+            fn (Truck $truck) => [$truck->id => $this->workedDays($tripsByTruck->get($truck->id, new Collection))]
         );
         $totalWorkedDays = $workedDays->sum();
 
@@ -90,13 +96,14 @@ class OverheadAllocationService
         return $costs + $driverPay;
     }
 
-    private function workedDays(Truck $truck, Period $period): int
+    /**
+     * Distinct days with at least one completed trip.
+     *
+     * @param  Collection<int, Trip>  $trips
+     */
+    private function workedDays(Collection $trips): int
     {
-        return Trip::query()
-            ->where('truck_id', $truck->id)
-            ->where('status', TripStatus::Completed)
-            ->whereBetween('actual_end', [$period->start->copy()->startOfDay(), $period->end->copy()->endOfDay()])
-            ->get(['actual_start', 'actual_end'])
+        return $trips
             ->map(fn (Trip $trip) => ($trip->actual_start ?? $trip->actual_end)->toDateString())
             ->unique()
             ->count();

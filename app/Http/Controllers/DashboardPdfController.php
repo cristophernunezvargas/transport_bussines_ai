@@ -36,13 +36,17 @@ class DashboardPdfController extends Controller
             ? 'resumen-semanal-'.$range->start->format('Y-m-d').'_'.$range->end->format('Y-m-d').'.pdf'
             : 'resumen-mensual-'.$range->start->format('Y-m').'.pdf';
 
+        $title = $weekly ? __('Resumen semanal') : __('Resumen mensual');
+
         return Pdf::loadView('reports.dashboard-pdf', [
-            'title' => $weekly ? __('Resumen semanal') : __('Resumen mensual'),
+            'title' => $title,
             'rangeText' => $rangeText,
             'totals' => $calculator->fleetTotals($rows),
             'rows' => $rows,
             'alerts' => MaintenanceSchedule::alertCounts(),
             'generatedAt' => now(),
-        ])->setPaper('letter', 'landscape')->download($filename);
+        ])->setPaper('letter', 'landscape')
+            ->addInfo(['Author' => config('app.name'), 'Creator' => config('app.name'), 'Title' => $title.' — '.$rangeText])
+            ->download($filename);
     }
 }

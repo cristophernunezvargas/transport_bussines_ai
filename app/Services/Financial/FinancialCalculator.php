@@ -49,8 +49,22 @@ class FinancialCalculator
      */
     public function truckSummary(Truck $truck, Period $period): array
     {
-        $costs = $this->costCalculator->forTruck($truck, $period);
-        $trips = $this->completedTripsForTruck($truck, $period);
+        return $this->summarize($truck, $period);
+    }
+
+    /**
+     * The shared summary body. `fleetSummary()` passes pre-loaded trips,
+     * cost breakdown and corrective downtime so costing N trucks doesn't
+     * cost N× the queries; everything is looked up per truck when null.
+     *
+     * @param  Collection<int, Trip>|null  $trips  The truck's completed trips in the period.
+     * @param  CostBreakdown|null  $costs  The truck's cost breakdown for the period.
+     * @return TruckSummary
+     */
+    private function summarize(Truck $truck, Period $period, ?Collection $trips = null, ?array $costs = null, ?float $downtimeDays = null): array
+    {
+        $costs ??= $this->costCalculator->forTruck($truck, $period);
+        $trips ??= $this->completedTripsForTruck($truck, $period);
 
         $revenue = round((float) $trips->sum('price'), 2);
         $km = round((float) $trips->sum('distance'), 2);
@@ -58,8 +72,10 @@ class FinancialCalculator
         $profitContribution = round($revenue - $costs['direct_cost'], 2);
         $profitNet = round($revenue - $costs['total_cost'], 2);
 
-        $availability = $this->availability($truck, $period);
-        $utilization = $this->utilization($truck, $period, $availability);
+        $availability = $downtimeDays === null
+            ? $this->availability($truck, $period)
+            : $this->availabilityFor($downtimeDays, $period);
+        $utilization = $this->utilization($truck, $period, $availability, $trips);
 
         return [
             'revenue' => $revenue,
@@ -156,8 +172,30 @@ class FinancialCalculator
      */
     public function fleetSummary(Period $period): array
     {
-        return array_map(function (Truck $truck) use ($period) {
-            $summary = $this->truckSummary($truck, $period);
+        $trucks = Truck::query()->get();
+
+        // One query per source (and one allocation) per period instead of one per truck.
+        $costs = $this->costCalculator->forFleet($trucks, $period);
+        $tripsByTruck = Trip::query()
+            ->where('status', TripStatus::Completed)
+            ->whereBetween('actual_end', [$period->start->copy()->startOfDay(), $period->end->copy()->endOfDay()])
+            ->get()
+            ->groupBy('truck_id');
+        $downtimeByTruck = Maintenance::query()
+            ->where('type', MaintenanceType::Corrective)
+            ->whereBetween('completion_date', [$period->start->toDateString(), $period->end->toDateString()])
+            ->selectRaw('truck_id, sum(downtime_days) as downtime')
+            ->groupBy('truck_id')
+            ->pluck('downtime', 'truck_id');
+
+        return array_map(function (Truck $truck) use ($period, $costs, $tripsByTruck, $downtimeByTruck) {
+            $summary = $this->summarize(
+                $truck,
+                $period,
+                $tripsByTruck->get($truck->id, new Collection),
+                $costs[$truck->id],
+                (float) ($downtimeByTruck[$truck->id] ?? 0),
+            );
 
             return [
                 'truck' => $truck,
@@ -175,7 +213,7 @@ class FinancialCalculator
                 'availability_pct' => $summary['availability_pct'],
                 'utilization_pct' => $summary['utilization_pct'],
             ];
-        }, array_values(Truck::query()->get()->all()));
+        }, array_values($trucks->all()));
     }
 
     /**
@@ -218,6 +256,11 @@ class FinancialCalculator
             ->whereBetween('completion_date', [$period->start->toDateString(), $period->end->toDateString()])
             ->sum('downtime_days');
 
+        return $this->availabilityFor($downtimeDays, $period);
+    }
+
+    private function availabilityFor(float $downtimeDays, Period $period): float
+    {
         $availableDays = max(0.0, $period->days() - $downtimeDays);
 
         return $period->days() > 0 ? $availableDays / $period->days() : 0.0;
@@ -226,8 +269,10 @@ class FinancialCalculator
     /**
      * `worked_days / available_days` within the period. Null when the truck
      * has zero available days (fully down).
+     *
+     * @param  Collection<int, Trip>|null  $trips  The truck's completed trips in the period, when already loaded.
      */
-    public function utilization(Truck $truck, Period $period, ?float $availability = null): ?float
+    public function utilization(Truck $truck, Period $period, ?float $availability = null, ?Collection $trips = null): ?float
     {
         $availability ??= $this->availability($truck, $period);
         $availableDays = $availability * $period->days();
@@ -236,7 +281,7 @@ class FinancialCalculator
             return null;
         }
 
-        $workedDays = $this->completedTripsForTruck($truck, $period)
+        $workedDays = ($trips ?? $this->completedTripsForTruck($truck, $period))
             ->map(fn (Trip $trip) => ($trip->actual_start ?? $trip->actual_end)->toDateString())
             ->unique()
             ->count();
