@@ -60,12 +60,13 @@ return [
     |--------------------------------------------------------------------------
     |
     | Here you may specify the default timezone for your application, which
-    | will be used by the PHP date and date-time functions. The timezone
-    | is set to "UTC" by default as it is suitable for most use cases.
+    | will be used by the PHP date and date-time functions. This business
+    | operates in Costa Rica (UTC-6, no daylight saving), so "today" and the
+    | Thu->Wed reporting weeks must follow that clock, not UTC.
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => env('APP_TIMEZONE', 'America/Costa_Rica'),
 
     /*
     |--------------------------------------------------------------------------

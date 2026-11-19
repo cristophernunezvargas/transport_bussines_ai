@@ -97,6 +97,7 @@ CI (`.github/workflows/tests.yml`): `composer setup` then `composer ci:check` on
 ## Architecture notes
 
 - Laravel 13 slim skeleton: `bootstrap/app.php` wires routing/middleware/exceptions (JSON errors for `api/*`); `bootstrap/providers.php` registers only `AppServiceProvider` + `FortifyServiceProvider`.
+- Timezone is `America/Costa_Rica` (`config/app.php`, overridable with `APP_TIMEZONE`), no longer UTC (2026-11-18): "today" and the Thu→Wed weeks must follow the business's clock. Timestamps stored before the change (`created_at` etc.) were written in UTC and now read 6 h earlier; date-only columns (trip dates, periods) are unaffected.
 - `AppServiceProvider::configureDefaults()`: `CarbonImmutable` dates, `DB::prohibitDestructiveCommands` in production, strict production password policy.
 - Auth is Fortify (headless). `FortifyServiceProvider` binds each auth view to a Livewire component in `resources/views/livewire/auth/*` and defines `login` / `two-factor` / `passkeys` rate limiters. Custom actions in `app/Actions/Fortify/`. Passkeys via `laravel/passkeys` (+ `resources/js/passkeys.js`); 2FA columns added by migration.
 - Routes: `routes/web.php` (`/`, `/dashboard` behind `auth`+`verified`), `routes/settings.php` (profile/appearance/security via `Route::livewire()`), `routes/console.php`.
