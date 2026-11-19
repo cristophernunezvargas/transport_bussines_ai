@@ -163,16 +163,7 @@ class Index extends Component
     #[Computed]
     public function maintenanceAlerts(): array
     {
-        $statuses = MaintenanceSchedule::query()
-            ->where('active', true)
-            ->with('truck')
-            ->get()
-            ->map(fn (MaintenanceSchedule $schedule) => $schedule->status());
-
-        return [
-            'overdue' => $statuses->filter(fn (string $status) => $status === 'VENCIDO')->count(),
-            'upcoming' => $statuses->filter(fn (string $status) => $status === 'PROXIMO')->count(),
-        ];
+        return MaintenanceSchedule::alertCounts();
     }
 
     public function period(): Period
@@ -199,19 +190,6 @@ class Index extends Component
      */
     private function totalsOf(array $rows): array
     {
-        $revenue = round(array_sum(array_column($rows, 'revenue')), 2);
-        $totalCost = round(array_sum(array_column($rows, 'total_cost')), 2);
-        $profitNet = round(array_sum(array_column($rows, 'profit_net')), 2);
-        $km = round(array_sum(array_column($rows, 'km')), 2);
-
-        return [
-            'revenue' => $revenue,
-            'total_cost' => $totalCost,
-            'profit_net' => $profitNet,
-            'km' => $km,
-            'margin_pct' => $revenue > 0 ? round($profitNet / $revenue * 100, 2) : null,
-            'cost_per_km' => $km > 0 ? round($totalCost / $km, 2) : null,
-            'revenue_per_km' => $km > 0 ? round($revenue / $km, 2) : null,
-        ];
+        return app(FinancialCalculator::class)->fleetTotals($rows);
     }
 }

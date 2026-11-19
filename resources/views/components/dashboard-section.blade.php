@@ -9,6 +9,7 @@
     'next',
     'current',
     'currentLabel',
+    'pdfUrl' => null,
 ])
 
 @php
@@ -30,6 +31,10 @@
             <flux:button size="sm" variant="ghost" icon="chevron-left" wire:click="{{ $previous }}" aria-label="{{ __('Anterior') }}" />
             <flux:button size="sm" variant="ghost" wire:click="{{ $current }}">{{ $currentLabel }}</flux:button>
             <flux:button size="sm" variant="ghost" icon="chevron-right" wire:click="{{ $next }}" aria-label="{{ __('Siguiente') }}" />
+
+            @if ($pdfUrl)
+                <flux:button size="sm" variant="outline" icon="arrow-down-tray" :href="$pdfUrl" class="ms-2">{{ __('PDF') }}</flux:button>
+            @endif
         </div>
     </div>
 

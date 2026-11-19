@@ -103,4 +103,24 @@ class MaintenanceSchedule extends Model
 
         return 'AL_DIA';
     }
+
+    /**
+     * Count of active schedules currently VENCIDO / PROXIMO, for the
+     * dashboard and its PDF reports.
+     *
+     * @return array{overdue: int, upcoming: int}
+     */
+    public static function alertCounts(): array
+    {
+        $statuses = self::query()
+            ->where('active', true)
+            ->with('truck')
+            ->get()
+            ->map(fn (self $schedule) => $schedule->status());
+
+        return [
+            'overdue' => $statuses->filter(fn (string $status) => $status === 'VENCIDO')->count(),
+            'upcoming' => $statuses->filter(fn (string $status) => $status === 'PROXIMO')->count(),
+        ];
+    }
 }

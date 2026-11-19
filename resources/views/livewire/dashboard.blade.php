@@ -47,6 +47,7 @@
             next="nextWeek"
             current="thisWeek"
             :current-label="__('Esta semana')"
+            :pdf-url="route('dashboard.pdf', ['period' => 'weekly', 'date' => $period->start->toDateString()])"
         />
 
         <x-dashboard-section
@@ -59,6 +60,7 @@
             next="nextMonth"
             current="thisMonth"
             :current-label="__('Este mes')"
+            :pdf-url="route('dashboard.pdf', ['period' => 'monthly', 'date' => $monthPeriod->start->toDateString()])"
         />
 
         <x-dashboard-section

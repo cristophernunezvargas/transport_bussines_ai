@@ -25,6 +25,18 @@ class IndexTest extends TestCase
         $this->get(route('dashboard'))->assertRedirect(route('login'));
     }
 
+    public function test_weekly_and_monthly_sections_link_to_their_pdf_for_the_selected_period(): void
+    {
+        $this->actingAs(User::factory()->viewer()->create());
+
+        $component = Livewire::test(Index::class);
+        $week = Period::weekContaining(now())->start->toDateString();
+        $month = Period::monthContaining(now())->start->toDateString();
+
+        $component->assertSeeHtml(e(route('dashboard.pdf', ['period' => 'weekly', 'date' => $week])));
+        $component->assertSeeHtml(e(route('dashboard.pdf', ['period' => 'monthly', 'date' => $month])));
+    }
+
     public function test_a_viewer_can_see_the_dashboard(): void
     {
         $this->actingAs(User::factory()->viewer()->create());

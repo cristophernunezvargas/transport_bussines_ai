@@ -179,6 +179,34 @@ class FinancialCalculator
     }
 
     /**
+     * Fleet-wide totals of `fleetSummary()` rows — shared by the dashboard
+     * and its PDF reports so both always show the same figures.
+     *
+     * @param  list<FleetRow>  $rows
+     * @return array{
+     *     revenue: float, total_cost: float, profit_net: float, km: float,
+     *     margin_pct: ?float, cost_per_km: ?float, revenue_per_km: ?float,
+     * }
+     */
+    public function fleetTotals(array $rows): array
+    {
+        $revenue = round(array_sum(array_column($rows, 'revenue')), 2);
+        $totalCost = round(array_sum(array_column($rows, 'total_cost')), 2);
+        $profitNet = round(array_sum(array_column($rows, 'profit_net')), 2);
+        $km = round(array_sum(array_column($rows, 'km')), 2);
+
+        return [
+            'revenue' => $revenue,
+            'total_cost' => $totalCost,
+            'profit_net' => $profitNet,
+            'km' => $km,
+            'margin_pct' => $revenue > 0 ? round($profitNet / $revenue * 100, 2) : null,
+            'cost_per_km' => $km > 0 ? round($totalCost / $km, 2) : null,
+            'revenue_per_km' => $km > 0 ? round($revenue / $km, 2) : null,
+        ];
+    }
+
+    /**
      * Only breakdowns/corrective repairs count against availability
      * (docs/business/discovery.md §I) — planned/preventive service does not.
      */
