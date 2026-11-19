@@ -34,6 +34,14 @@
 
             @if ($pdfUrl)
                 <flux:button size="sm" variant="outline" icon="arrow-down-tray" :href="$pdfUrl" class="ms-2">{{ __('PDF') }}</flux:button>
+                <flux:button
+                    size="sm"
+                    variant="outline"
+                    icon="share"
+                    x-data="sharePdf(@js($pdfUrl), @js(config('app.name').' · '.__('Resumen').' '.mb_strtolower($label).' '.$rangeText))"
+                    x-on:click="share()"
+                    x-bind:disabled="busy"
+                >{{ __('Compartir') }}</flux:button>
             @endif
         </div>
     </div>

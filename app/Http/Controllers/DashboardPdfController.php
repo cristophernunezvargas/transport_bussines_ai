@@ -46,6 +46,7 @@ class DashboardPdfController extends Controller
             'alerts' => MaintenanceSchedule::alertCounts(),
             'generatedAt' => now(),
         ])->setPaper('letter', 'landscape')
+            ->setOption(['enable_font_subsetting' => true])
             ->addInfo(['Author' => config('app.name'), 'Creator' => config('app.name'), 'Title' => $title.' — '.$rangeText])
             ->download($filename);
     }

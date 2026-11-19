@@ -50,6 +50,19 @@ class IndexTest extends TestCase
         ])));
     }
 
+    public function test_the_weekly_and_monthly_sections_offer_to_share_their_pdf(): void
+    {
+        $this->actingAs(User::factory()->viewer()->create());
+
+        // Weekly and monthly have a share button; the annual section has no PDF.
+        Livewire::test(Index::class)
+            ->assertSeeHtml('sharePdf(')
+            ->assertSeeHtml(e(route('dashboard.pdf', ['period' => 'weekly', 'date' => Period::weekContaining(now())->start->toDateString()])));
+
+        $html = Livewire::test(Index::class)->html();
+        $this->assertSame(2, substr_count($html, 'x-data="sharePdf('));
+    }
+
     public function test_a_viewer_can_see_the_dashboard(): void
     {
         $this->actingAs(User::factory()->viewer()->create());
