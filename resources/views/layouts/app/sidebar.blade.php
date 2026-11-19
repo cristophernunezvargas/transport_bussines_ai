@@ -4,8 +4,7 @@
         @include('partials.head')
     </head>
     <body class="min-h-screen bg-zinc-100 antialiased dark:bg-zinc-950">
-        {{-- `dark` scopes Flux's dark variants to the sidebar: it is espresso in both themes. --}}
-        <flux:sidebar sticky collapsible="mobile" class="dark border-e border-zinc-800 bg-zinc-900">
+        <flux:sidebar sticky collapsible="mobile" class="border-e border-zinc-200 bg-zinc-50 dark:border-white/10 dark:bg-zinc-900">
             <flux:sidebar.header>
                 <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate />
                 <flux:sidebar.collapse class="lg:hidden" />
