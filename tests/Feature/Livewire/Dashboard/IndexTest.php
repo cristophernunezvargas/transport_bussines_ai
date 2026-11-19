@@ -37,6 +37,19 @@ class IndexTest extends TestCase
         $component->assertSeeHtml(e(route('dashboard.pdf', ['period' => 'monthly', 'date' => $month])));
     }
 
+    public function test_each_truck_total_cost_links_to_its_cost_detail_for_that_period(): void
+    {
+        $truck = Truck::factory()->create();
+        $period = Period::weekContaining(now());
+        $this->actingAs(User::factory()->viewer()->create());
+
+        Livewire::test(Index::class)->assertSeeHtml(e(route('trucks.costs', [
+            'truck' => $truck->id,
+            'from' => $period->start->toDateString(),
+            'to' => $period->end->toDateString(),
+        ])));
+    }
+
     public function test_a_viewer_can_see_the_dashboard(): void
     {
         $this->actingAs(User::factory()->viewer()->create());

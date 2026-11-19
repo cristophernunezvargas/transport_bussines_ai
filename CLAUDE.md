@@ -238,6 +238,8 @@ import path.
 
 The weekly and monthly sections have a **PDF** download button (2026-11-18): `DashboardPdfController` (route `dashboard.pdf`, `/dashboard/pdf/{weekly|monthly}?date=Y-m-d`, validated by `DashboardPdfRequest`) renders `resources/views/reports/dashboard-pdf.blade.php` with `barryvdh/laravel-dompdf` (pure PHP; Letter landscape, DejaVu Sans so `₡` renders). Totals come from `FinancialCalculator::fleetTotals()`, shared with the dashboard. dompdf only supports CSS 2.1 (no flex/grid), so the template is table-based.
 
+In every per-truck table, the **Costo total** figure links to that truck's cost detail (`Trucks\Costs`, route `trucks.costs`, `/trucks/{truck}/costs?from=Y-m-d&to=Y-m-d`, 2026-11-18): the `CostCalculator` breakdown plus the source records behind each line (fuel, maintenance, truck expenses, prorated fixed costs, tolls when present), filtered exactly like `CostCalculator::forTruck()` so they add up. Tires and allocated overhead have no individual records and are explained as estimates. Invalid dates fall back to the current week.
+
 8 tests in `tests/Feature/Livewire/Dashboard/IndexTest.php` (plus the pre-existing
 `tests/Feature/DashboardTest.php`, still passing unchanged against the new component).
 

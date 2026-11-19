@@ -67,7 +67,11 @@
                         <flux:table.cell variant="strong">{{ $row['truck']->plate }}</flux:table.cell>
                         <flux:table.cell align="end">₡{{ number_format($row['revenue'], 0) }}</flux:table.cell>
                         <flux:table.cell align="end">{{ number_format($row['km'], 0) }}</flux:table.cell>
-                        <flux:table.cell align="end">₡{{ number_format($row['total_cost'], 0) }}</flux:table.cell>
+                        <flux:table.cell align="end">
+                            <a href="{{ route('trucks.costs', ['truck' => $row['truck']->id, 'from' => $period->start->toDateString(), 'to' => $period->end->toDateString()]) }}" wire:navigate class="underline decoration-dotted underline-offset-4 hover:text-blue-600 dark:hover:text-blue-400" title="{{ __('Ver el detalle de costos de :plate', ['plate' => $row['truck']->plate]) }}">
+                                ₡{{ number_format($row['total_cost'], 0) }}
+                            </a>
+                        </flux:table.cell>
                         <flux:table.cell align="end" :class="$row['profit_net'] < 0 ? 'text-red-600 dark:text-red-400' : ''">
                             ₡{{ number_format($row['profit_net'], 0) }}
                         </flux:table.cell>

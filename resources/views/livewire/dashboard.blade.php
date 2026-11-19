@@ -40,6 +40,7 @@
         <x-dashboard-section
             :label="__('Semanal')"
             color="blue"
+            :period="$period"
             :range-text="$period->start->format('d/m/Y').' — '.$period->end->format('d/m/Y')"
             :totals="$this->fleetTotals"
             :rows="$this->fleetRows"
@@ -53,6 +54,7 @@
         <x-dashboard-section
             :label="__('Mensual')"
             color="violet"
+            :period="$monthPeriod"
             :range-text="ucfirst($months[$monthPeriod->start->month - 1]).' '.$monthPeriod->start->year"
             :totals="$this->monthTotals"
             :rows="$this->monthRows"
@@ -66,6 +68,7 @@
         <x-dashboard-section
             :label="__('Anual')"
             color="emerald"
+            :period="$yearPeriod"
             :range-text="(string) $yearPeriod->start->year"
             :totals="$this->yearTotals"
             :rows="$this->yearRows"
