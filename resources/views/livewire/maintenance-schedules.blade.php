@@ -63,7 +63,7 @@
                                     <flux:button size="sm" variant="ghost" icon="pencil" wire:click="edit({{ $schedule->id }})" aria-label="{{ __('Editar') }}" />
                                 @endcan
                                 @can('delete', $schedule)
-                                    <flux:button size="sm" variant="ghost" icon="trash" wire:click="delete({{ $schedule->id }})" wire:confirm="{{ __('¿Eliminar este programa?') }}" aria-label="{{ __('Eliminar') }}" />
+                                    <flux:button size="sm" variant="ghost" icon="trash" x-on:click="$dispatch('confirm-action', { message: @js(__('¿Eliminar este programa?')), run: () => $wire.delete({{ $schedule->id }}) })" aria-label="{{ __('Eliminar') }}" />
                                 @endcan
                             </div>
                         </flux:table.cell>
