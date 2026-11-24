@@ -53,23 +53,40 @@ composer types:check           # análisis estático (si falta memoria: vendor/b
 
 Decisiones clave en [`docs/decisions/`](docs/decisions): método de reparto de costos generales, origen de la distancia del viaje, período semanal y asignación de pagos.
 
-## Integraciones futuras con n8n
+## Integraciones con n8n
 
-> **Estado: planificado, todavía no implementado.** n8n es la herramienta prevista para la automatización; hoy el sistema no tiene ninguna integración activa.
+n8n **mueve datos hacia y desde** el sistema, pero MySQL sigue siendo la única fuente de verdad. Ninguna hoja de cálculo es almacenamiento principal, y lo que llega por n8n pasa por las mismas validaciones que la captura manual.
 
-Principio: n8n **mueve datos hacia y desde** el sistema, pero MySQL sigue siendo la única fuente de verdad. Ninguna hoja de cálculo es almacenamiento principal, y los datos importados pasan por las mismas validaciones que la captura manual.
+### Ya disponible: horas de conductores
 
-**Previstas en el análisis de negocio** (`docs/business/discovery.md`):
+n8n envía las horas diarias que ya registra y el sistema las convierte en el total semanal (jueves a miércoles) de cada conductor, para no capturarlas dos veces.
 
-1. **Importación de estados de cuenta de combustible.** Las estaciones pueden entregar sus estados de cuenta bajo pedido; n8n los leería y crearía los registros de combustible, evitando la captura manual.
-2. **Importación de facturas y pagos** desde el sistema externo donde se emiten, hacia las tablas de facturación que ya existen en el esquema (con `InvoiceCalculator` listo para recalcular totales y estados).
+- **Ruta:** `POST /api/integrations/driver-worklogs`, protegida con un token (`Authorization: Bearer ...`).
+- **Configuración** (en el `.env` de cada entorno y en las credenciales de n8n, nunca en el repositorio): `N8N_API_TOKEN` con un secreto largo y aleatorio, y `N8N_USER_EMAIL` con el correo de un usuario creado en *Usuarios* (por ejemplo "n8n"), al que se atribuyen los registros importados. Sin token, la ruta rechaza todo.
+- **Cuerpo:** una entrada por día trabajado.
 
-**Propuestas a validar con el dueño:**
+```json
+{
+  "entries": [
+    { "driver_name": "Iván", "work_date": "2026-11-23", "hours": 10.5 },
+    { "driver_name": "Iván", "work_date": "2026-11-24", "hours": 9 }
+  ]
+}
+```
 
-3. **Envío automático de los PDF** semanal y mensual por correo o mensajería al cierre de cada período.
+- **Respuesta:** `{ "created": 1, "updated": 0, "unchanged": 0, "rejected": [] }`. En `rejected` vienen los conductores que no se pudieron importar (nombre desconocido o repetido, o más de 168 horas en la semana); el resto sí se importa.
+- **Reglas:** el nombre se compara sin distinguir mayúsculas, tildes ni espacios con el nombre del conductor en el sistema. El total semanal se **fija** con los días recibidos, no se suma, así que reenviar la misma semana no duplica nada. Por eso n8n debe enviar **todos los días de la semana** que toque (jueves a miércoles) cada vez, no solo el del día. Si esa semana ya tenía horas escritas a mano, la importación las reemplaza (la nota escrita a mano se conserva).
+- **Columnas de la hoja:** se usan `Name` (nombre del conductor), `workDate` y `hoursWorked`. El camión, las horas de inicio y fin y la descripción no se envían, porque las horas de conductores no se atribuyen a un camión (ADR 0001).
+- **En n8n:** un nodo *Schedule* (por ejemplo cada noche), un nodo de Google Sheets que lea las filas de la semana en curso, un nodo *Code* o *Aggregate* que arme `entries` con esos tres campos, y un nodo *HTTP Request* `POST` con autenticación *Bearer*. Programa el flujo en hora de Costa Rica.
+
+### Previstas
+
+1. **Importación de estados de cuenta de combustible.** Las estaciones pueden entregarlos bajo pedido; n8n los leería y crearía los registros de combustible.
+2. **Importación de facturas y pagos** desde el sistema externo donde se emiten, hacia las tablas de facturación que ya existen en el esquema.
+3. **Envío automático de los PDF** semanal y mensual por correo o Telegram al cierre de cada período (el botón *Compartir* ya permite pasarlos por WhatsApp a mano).
 4. **Avisos de mantenimiento** cuando un programa pase a `PROXIMO` o `VENCIDO`.
 
-Antes de construir cualquiera de ellas hace falta definir cómo entra la información (endpoint autenticado o importación por lotes), cómo se evitan duplicados y qué usuario figura como autor de los registros importados.
+Para las previstas hace falta definir antes cómo entra la información, cómo se evitan duplicados y qué usuario figura como autor, tal como se resolvió para las horas de conductores.
 
 ## Despliegue
 
