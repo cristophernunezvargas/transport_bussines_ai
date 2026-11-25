@@ -2,40 +2,40 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Laravel\Fortify\Features;
 use Tests\TestCase;
 
+/**
+ * Public registration is disabled (config/fortify.php): logins are created by
+ * an admin on the Users screen, so nobody can sign themselves up.
+ */
 class RegistrationTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
+    public function test_the_registration_screen_does_not_exist(): void
     {
-        parent::setUp();
-
-        $this->skipUnlessFortifyHas(Features::registration());
+        $this->get('/register')->assertNotFound();
     }
 
-    public function test_registration_screen_can_be_rendered(): void
+    public function test_nobody_can_register_themselves(): void
     {
-        $response = $this->get(route('register'));
-
-        $response->assertOk();
-    }
-
-    public function test_new_users_can_register(): void
-    {
-        $response = $this->post(route('register.store'), [
+        $this->post('/register', [
             'name' => 'John Doe',
             'email' => 'test@example.com',
             'password' => 'password',
             'password_confirmation' => 'password',
-        ]);
+        ])->assertNotFound();
 
-        $response->assertSessionHasNoErrors()
-            ->assertRedirect(route('dashboard', absolute: false));
+        $this->assertGuest();
+        $this->assertSame(0, User::query()->count());
+    }
 
-        $this->assertAuthenticated();
+    public function test_the_login_page_no_longer_offers_to_sign_up(): void
+    {
+        $this->get(route('login'))
+            ->assertOk()
+            ->assertDontSee('Sign up');
     }
 }
