@@ -301,7 +301,7 @@ class FinancialCalculator
             ->get();
     }
 
-    private function resolveTripCustomerId(Trip $trip): ?int
+    public function resolveTripCustomerId(Trip $trip): ?int
     {
         if ($trip->rateAgreement !== null) {
             return $trip->rateAgreement->customer_id;

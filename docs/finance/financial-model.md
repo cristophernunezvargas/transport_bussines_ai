@@ -137,6 +137,18 @@ by customer c  : Σ_{i of c} (price_i − DC_i) − Σ_{i of c} allocated_IC(i)
 by truck t     : profit(t,P)                                       (J.6)
 ```
 
+### J.8b Profitability by route / customer, full-cost view (screen "Rentabilidad")
+
+```
+cost_i            = TC(t,P) × (km_i / km(t,P))      # truck t's TOTAL cost in P, split by the trip's share of t's km
+by route r        : Σ_{i on r} (price_i − cost_i)
+by customer c     : Σ_{i of c} (price_i − cost_i)    # trips with no rate agreement/invoice -> 'no customer' row
+unallocated(P)    = Σ_t TC(t,P) − Σ_i cost_i         # cost of trucks with no trips in P
+Σ_i price_i − Σ_t TC(t,P)  = fleet net profit (J.9)  # the screen reconciles with the dashboard
+```
+
+J.7/J.8 only charge a trip the fuel, tolls and expenses *linked to it* plus allocated indirect cost. Fuel purchases and trip links are optional in this app, and maintenance and tires are truck-level, so that view leaves most direct cost out of every route. J.8b keeps the same km-share rule but applies it to the truck's full cost. Km are estimates while trip distance defaults from the route (ADR 0002).
+
 ### J.9 Fleet aggregates
 
 ```

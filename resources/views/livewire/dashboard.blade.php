@@ -29,7 +29,7 @@
         </a>
         <p class="flex items-start gap-2 self-center text-sm text-zinc-500 sm:col-span-2 lg:col-span-1 lg:max-w-xs">
             <flux:icon.information-circle class="mt-0.5 size-4 shrink-0" />
-            {{ __('Los km y las métricas por km son un estimado mientras no se capture el odómetro por viaje (ver Rutas).') }}
+            {{ __('Los km y las métricas por km son un estimado: salen de los km estándar de cada ruta, no de un odómetro por viaje.') }}
         </p>
     </div>
 

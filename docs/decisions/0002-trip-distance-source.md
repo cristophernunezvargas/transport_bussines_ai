@@ -53,3 +53,7 @@ distance as zero.
 | Require odometer entry before a trip can be completed | Contradicts current operating reality (§L Q20); would block the pilot |
 | Estimate distance from fuel consumed ÷ baseline km/l | Baseline km/l itself unverified without odometer; less accurate than route standard km |
 | Leave distance null and hide per-km KPIs entirely | Defeats the project's core purpose; the route-based estimate is good enough to act on if clearly labelled |
+
+## Owner decision (2026-11-24)
+
+The company will **not** capture an odometer reading per trip. Trip distance stays the route's `standard_km`, and every km-based figure (km, cost per km, revenue per km, profit per km) stays an estimate, labelled as such in the dashboard, the Rentabilidad screen and the PDFs. The workshop odometer reading at each service remains the only real anchor (`trucks.current_odometer`). The "if the company later adopts per-trip odometer capture" path above stays open but is not planned.

@@ -202,7 +202,7 @@
     </table>
 
     <div class="note">
-        {{ __('Los km y las métricas por km son un estimado mientras no se capture el odómetro por viaje (ver Rutas). No son valores exactos.') }}
+        {{ __('Los km y las métricas por km son un estimado: salen de los km estándar de cada ruta, no de un odómetro por viaje. No son valores exactos.') }}
     </div>
 </body>
 </html>
